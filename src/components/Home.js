@@ -11,25 +11,27 @@ const Home = props => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [category, setCategory] = useState(null);
 
     const dropdownToggle = () => setDropdownOpen(prevState => !prevState);
 
     useEffect(() => {
-        db.collection("categories").onSnapshot(snapshot=>{
-            let options = [];
+        let unsubscribe = db.collection("categories").onSnapshot(snapshot=>{
+            let options = [<DropdownItem key="all" onClick={handleCategory}>All</DropdownItem>];
             snapshot.forEach(doc => {
                 const jsonData = doc.data();
-                Object.keys(jsonData).forEach((key, idx) => {
-                    console.log(idx);
-                    options.push(<DropdownItem>{jsonData[key]}</DropdownItem>)
+                Object.keys(jsonData).forEach(key => {
+                    options.push(<DropdownItem key={key} onClick={handleCategory}>{jsonData[key]}</DropdownItem>)
                 });
             })
             setCategories(options);
         })
-    }, [categories]);
+        return () => unsubscribe();
+    }, []);
 
     const handleCategory = event => {
-        console.log(event.target.value);
+        setCategory(event.target.innerText);
+        // console.log("Home: ", event.target.innerText, category);
     }
 
     return (
@@ -37,8 +39,8 @@ const Home = props => {
             <div className="col-md-8">
                 { props.user && <Upload user={props.user} /> }
                 {!props.user && <h3 style={{color: "#d49692", textAlign: "center", marginTop: "20px"}}>Please login to upload images!</h3>}
-                <ImageGrid setSelectedImage={setSelectedImage} />
-                {selectedImage && <Modal selectedImage={selectedImage} setSelectedImage={setSelectedImage} username={props.user.displayName} />}
+                <ImageGrid setSelectedImage={setSelectedImage} category={category} />
+                {selectedImage && <Modal selectedImage={selectedImage} setSelectedImage={setSelectedImage} user={props.user} username={props.user ? props.user.displayName : ""} />}
             </div>
             <div className="col-md-4" style={{padding: "50px", borderLeft: "1px solid #efb6b2"}}>
                 <Dropdown isOpen={dropdownOpen} toggle={dropdownToggle}>

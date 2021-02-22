@@ -8,7 +8,7 @@ const ProgressBar = (props) => {
     useEffect(() => {
         if (url) {
           props.setFile(null);
-          props.setCategory("");
+          // props.setCategory("");
           props.setShowProgressBar(false);
         }
       }, [url, props.setFile]);

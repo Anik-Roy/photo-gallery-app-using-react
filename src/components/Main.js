@@ -32,7 +32,7 @@ const Main = props => {
             <Switch>
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
-                <Route exact path="/" component={Home}/>
+                <Route exact path="/" render={()=>(<Home user={user} />)} />
                 <Redirect to="/" />
             </Switch>)
     }

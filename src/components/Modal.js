@@ -27,14 +27,14 @@ const Modal = props => {
     }
 
     return (
-        <motion.div className="backdrop" onClick={handleClick}
+        <motion.div style={{zIndex: "1"}} className="backdrop" onClick={handleClick}
             initial={{opacity: 0}}
             animate={{opacity: 1}}>
             <div style={{background: "white", width: "50%", margin: "0 auto", overflowY: "scroll"}}>
                 <motion.img src={props.selectedImage.url} alt="enlarged pic"
                     initial={{y: "-100vh"}}
                     animate={{y: 0}}/>
-                <CommentForm id={props.selectedImage.id} username={props.username} />
+                { props.user && <CommentForm id={props.selectedImage.id} username={props.username} /> }
                 <hr />
                 <div className="post_comments">
                     {comments.map(comment=>{

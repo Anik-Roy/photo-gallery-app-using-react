@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input } from 'reactstrap';
 import ProgressBar from './ProgressBar';
 import { db } from '../firebase';
+import { isEqual } from "lodash";
+
+const usePrevious = value => {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+}
 
 const Upload = props => {
     const [file, setFile] = useState(null);
@@ -10,19 +19,23 @@ const Upload = props => {
     const [categoryError, setCategoryError] = useState(null);
     const [showProgressBar, setShowProgressBar] = useState(false);
     const [categories, setCategories] = useState([]);
+    const prevCategories = usePrevious(categories);
 
     useEffect(() => {
-        db.collection("categories").onSnapshot(snapshot=>{
-            let options = [<option key="__SELECT_CATEGORY__" value="">Select Category</option>];
-            snapshot.forEach(doc => {
-                const jsonData = doc.data();
-                Object.keys(jsonData).forEach(key => {
-                    options.push(<option key={key} value={jsonData[key]}>{jsonData[key]}</option>)
-                });
+        if(!isEqual(categories, prevCategories)) {
+            console.log("categories has changed!");
+            db.collection("categories").onSnapshot(snapshot=>{
+                let options = [<option key="__SELECT_CATEGORY__" value="">Select Category</option>];
+                snapshot.forEach(doc => {
+                    const jsonData = doc.data();
+                    Object.keys(jsonData).forEach(key => {
+                        options.push(<option key={key} value={jsonData[key]}>{jsonData[key]}</option>)
+                    });
+                })
+                setCategories(options);
             })
-            setCategories(options);
-        })
-    }, [categories]);
+        }
+    }, [prevCategories]);
 
     const types = ['image/png', 'image/jpeg', 'image/jpg'];
 
@@ -62,10 +75,10 @@ const Upload = props => {
     const handleSubmit = event => {
         event.preventDefault();
         let result = validateInput();
-        console.log(result);
+        // console.log(result);
         if(result) {
-            console.log(file, category);
-            console.log(error, categoryError);
+            // console.log(file, category);
+            // console.log(error, categoryError);
             setShowProgressBar(true);
         }
     }

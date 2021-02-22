@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import Loader from "react-loader-spinner";
 
 const ImageGrid = props => {
-    const { docs } = useFirestore("images");
+    const { docs } = useFirestore("images", props.category);
     // console.log("Image Grid: docs", docs);
-    
+    // console.log("Image Grid:", props.category);
     return (
         <div className="img-grid">
             
